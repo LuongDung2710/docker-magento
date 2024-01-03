@@ -33,7 +33,7 @@ select project in $OPTION1 $OPTION2 $OPTION3; do
             sed -i 's/louisphp8:1.0/louisphp7.4composer1:1.0/g' compose.yaml;
             break;;
         $OPTION2 ) 
-            sed -i 's/louisphp8:1.0/louisphp7.4composer2:1.0/g' compose.yaml;
+            sed -i 's/louisphp8:1.0/louisphp7.4composer2.22:1.0/g' compose.yaml;
             break;;
         $OPTION3 ) 
             sed -i 's/louisphp8:1.0/louisphp8.2composer2.22:1.0/g' compose.yaml;
@@ -77,13 +77,13 @@ bin/mysql < src/dbdump/$DB
 # Import config from app/etc/env.php and app/etc/config.env file
 echo -e "${BGREEN} Import Config"
 bin/magento app:config:import
-bin/magento config:set web/secure/base_url https://$DOMAIN/
-bin/magento config:set web/unsecure/base_url https://$DOMAIN/
-bin/magento config:set 	web/unsecure/base_link_url https://$DOMAIN/
-bin/magento config:set 	web/secure/base_link_url https://$DOMAIN/
-bin/magento config:set --scope=store --scope-code=admin web/secure/base_url https://$DOMAIN/
-bin/magento config:set --scope=store --scope-code=admin web/unsecure/base_url https://$DOMAIN/
-bin/magento config:set admin/url/custom https://$DOMAIN/
+#bin/magento config:set web/secure/base_url https://$DOMAIN/
+#bin/magento config:set web/unsecure/base_url https://$DOMAIN/
+#bin/magento config:set 	web/unsecure/base_link_url https://$DOMAIN/
+#bin/magento config:set 	web/secure/base_link_url https://$DOMAIN/
+#bin/magento config:set --scope=store --scope-code=admin web/secure/base_url https://$DOMAIN/
+#bin/magento config:set --scope=store --scope-code=admin web/unsecure/base_url https://$DOMAIN/
+#bin/magento config:set admin/url/custom https://$DOMAIN/
 
 # Get Magento Version
 version=$(cat src/composer.json | grep "magento/product-community-edition")

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Color set
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -11,12 +13,33 @@ CROSS='\xE2\x9D\x8C'
 DOMAIN=$1
 SOURCE_FILE=$2
 PROJECT=src
-DB=$(ls $PROJECT/dbdump)
 
 # Unzip source file to src folder
 echo -e "${BGREEN} Unzip Source Code to src folder \n"
 unzip $SOURCE_FILE -d $PROJECT
 sleep 2
+
+DB=$(ls $PROJECT/dbdump)
+
+# Select PHP and Composer Version
+echo -e "${BGREEN}What project do you want to install?${NC}"
+select project in "Composer 1 and PHP 7.4" "Composer 2 and PHP 7.4" "Composer 2 and PHP 8.2" "Others"; do
+    case $project in
+        Composer 1 and PHP 7.4 ) 
+            sed -i 's/louisphp8:1.0/louisphp7.4composer1:1.0/g' compose.yaml;
+            break;;
+        Composer 2 and PHP 7.4 ) 
+            sed -i 's/louisphp8:1.0/louisphp7.4composer2:1.0/g' compose.yaml;
+            break;;
+        Composer 2 and PHP 8.1 ) 
+            sed -i 's/louisphp8:1.0/louisphp8.2composer2.22:1.0/g' compose.yaml;
+            break;;
+    esac
+done
+
+sleep 1
+
+
 
 # Start container
 echo -e "${BGREEN} Start Container \n"
@@ -50,12 +73,6 @@ bin/mysql < src/dbdump/$DB
 # Import config from app/etc/env.php and app/etc/config.env file
 echo -e "${BGREEN} Import Config"
 bin/magento app:config:import
-
-
-# Create a DNS host entry and setup Magento base url
-echo -e "${BGREEN} Set up Domain"
-
-bin/setup-domain $DOMAIN
 bin/magento config:set web/secure/base_url https://$DOMAIN/
 bin/magento config:set web/unsecure/base_url https://$DOMAIN/
 bin/magento config:set 	web/unsecure/base_link_url https://$DOMAIN/
@@ -63,3 +80,19 @@ bin/magento config:set 	web/secure/base_link_url https://$DOMAIN/
 bin/magento config:set --scope=store --scope-code=admin web/secure/base_url https://$DOMAIN/
 bin/magento config:set --scope=store --scope-code=admin web/unsecure/base_url https://$DOMAIN/
 bin/magento config:set admin/url/custom https://$DOMAIN/
+
+# Get Magento Version
+version=$(cat src/composer.json | grep "magento/product-community-edition")
+version=${version:46:3}
+if [[ $version = "2.4" ]]; then
+    echo -e "\n${BGREEN}Setting up Elasticsearch ...${NC}"
+    bin/magento config:set catalog/search/engine 'elasticsearch7'
+    bin/magento config:set catalog/search/elasticsearch7_server_hostname 'elasticsearch'
+    bin/magento config:set catalog/search/elasticsearch7_server_port '9200'
+fi
+
+# Create a DNS host entry and setup Magento base url
+echo -e "${BGREEN} Set up Domain"
+
+bin/setup-domain $DOMAIN
+bin/restart

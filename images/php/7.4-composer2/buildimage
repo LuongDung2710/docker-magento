@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+docker build -t louisphp7.4composer2.22:1.0 .

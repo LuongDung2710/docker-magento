@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker build -t louisphp8.2composer2.22:1.0 .

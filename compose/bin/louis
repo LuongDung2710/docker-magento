@@ -36,13 +36,12 @@ select project in $OPTION1 $OPTION2 $OPTION3; do
             sed -i 's/louisphp8:1.0/louisphp7.4composer2.22:1.0/g' compose.yaml;
             break;;
         $OPTION3 ) 
-            sed -i 's/louisphp8:1.0/markoshust\/magento-php:8.2-fpm-0/g' compose.yaml;
+            sed -i 's/louisphp8:1.0/louisphp8.2composer2.22:1.0/g' compose.yaml;
             break;;
     esac
 done
 
 sleep 1
-
 
 
 # Start container
@@ -65,6 +64,9 @@ echo -e "${BGREEN} Composer Install"
 bin/composer config --global --auth http-basic.repo.packagist.com louis.nguyen c01bbcb2c7cb0da26875b3075bece015a419ad301ae9878efae51b2b5fd4
 bin/composer install
 
+#Replace php-fpm:9000 with fastcgi_backend for 2.4.6-p1
+sed -i 's/php-fpm:9000/fastcgi_backend/g' nginx.conf.sample;
+
 # Copy all file from container to host 
 echo -e "${BGREEN} Copy all file from container to host"
 bin/copyfromcontainer --all ## Initial copy will take a few minutes...
@@ -77,13 +79,13 @@ bin/mysql < src/dbdump/$DB
 # Import config from app/etc/env.php and app/etc/config.env file
 echo -e "${BGREEN} Import Config"
 bin/magento app:config:import
-#bin/magento config:set web/secure/base_url https://$DOMAIN/
-#bin/magento config:set web/unsecure/base_url https://$DOMAIN/
-#bin/magento config:set 	web/unsecure/base_link_url https://$DOMAIN/
-#bin/magento config:set 	web/secure/base_link_url https://$DOMAIN/
-#bin/magento config:set --scope=store --scope-code=admin web/secure/base_url https://$DOMAIN/
-#bin/magento config:set --scope=store --scope-code=admin web/unsecure/base_url https://$DOMAIN/
-#bin/magento config:set admin/url/custom https://$DOMAIN/
+bin/magento config:set web/secure/base_url https://$DOMAIN/
+bin/magento config:set web/unsecure/base_url https://$DOMAIN/
+bin/magento config:set 	web/unsecure/base_link_url https://$DOMAIN/
+bin/magento config:set 	web/secure/base_link_url https://$DOMAIN/
+bin/magento config:set --scope=store --scope-code=admin web/secure/base_url https://$DOMAIN/
+bin/magento config:set --scope=store --scope-code=admin web/unsecure/base_url https://$DOMAIN/
+bin/magento config:set admin/url/custom https://$DOMAIN/
 
 # Get Magento Version
 version=$(cat src/composer.json | grep "magento/product-community-edition")

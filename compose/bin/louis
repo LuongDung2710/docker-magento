@@ -65,7 +65,7 @@ bin/composer config --global --auth http-basic.repo.packagist.com louis.nguyen c
 bin/composer install
 
 #Replace php-fpm:9000 with fastcgi_backend for 2.4.6-p1
-sed -i 's/php-fpm:9000/fastcgi_backend/g' nginx.conf.sample;
+sed -i 's/php-fpm:9000/fastcgi_backend/g' src/nginx.conf.sample;
 
 # Copy all file from container to host 
 echo -e "${BGREEN} Copy all file from container to host"

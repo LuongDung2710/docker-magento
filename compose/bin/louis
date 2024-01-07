@@ -102,3 +102,4 @@ echo -e "${BGREEN} Set up Domain"
 
 bin/setup-domain $DOMAIN
 bin/restart
+open https://$DOMAIN

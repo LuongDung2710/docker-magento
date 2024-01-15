@@ -37,7 +37,7 @@ select project in $OPTION1 $OPTION2 $OPTION3; do
             sed -i 's/mariadb:10.6/mariadb:10.4/g' compose.yaml;
             break;;
         $OPTION3 ) 
-            sed -i 's/louisphp8:1.0/louisphp7.4composer2.22:1.0/g' compose.yaml;
+            sed -i 's/louisphp8:1.0/louisphp8.2composer2.22:1.0/g' compose.yaml;
             sed -i 's/mariadb:10.6/mariadb:10.4/g' compose.yaml;
             break;;
     esac

@@ -11,7 +11,7 @@
             "version": "develop"
         }
     ],
-    "php-composer": "8.2-2",
+    "phpcomposer": "8.2-2",
     "configuration": [
         {
             "path": "paypal/wpp/api_username",

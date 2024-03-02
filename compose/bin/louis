@@ -57,14 +57,14 @@ case $PHP_COMPOSERVERSION in
     $OPTION1 ) 
         sed -i 's/louisphp8:1.0/louisphp7.4composer1:1.0/g' compose.yaml;
         sed -i 's/mariadb:10.6/mariadb:10.4/g' compose.yaml;
-        break;;
-    $OPTION2 ) 
+        ;;
+    $OPTION2 )
         sed -i 's/louisphp8:1.0/louisphp7.4composer2.22:1.0/g' compose.yaml;
         sed -i 's/mariadb:10.6/mariadb:10.4/g' compose.yaml;
-        break;;
-    $OPTION3 ) 
+        ;;
+    $OPTION3 )
         sed -i 's/louisphp8:1.0/louisphp8.2composer2.22:1.0/g' compose.yaml;
-        break;;
+        ;;
 esac
 
 # Start container

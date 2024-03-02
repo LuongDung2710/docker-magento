@@ -46,12 +46,12 @@ done
 
 
 
-PHP_COMPOSERVERSION=jq '.phpcomposer' $INPUTFILE
+PHP_COMPOSERVERSION=`jq '.phpcomposer' $INPUTFILE`
 
 #Setup Option
-OPTION1="7.4-1"
-OPTION2="7.4-2"
-OPTION3="8.2-2"
+OPTION1="\"7.4-1\""
+OPTION2="\"7.4-2\""
+OPTION3="\"8.2-2\""
 
 case $PHP_COMPOSERVERSION in
     $OPTION1 ) 
@@ -65,7 +65,7 @@ case $PHP_COMPOSERVERSION in
     $OPTION3 ) 
         sed -i 's/louisphp8:1.0/louisphp8.2composer2.22:1.0/g' compose.yaml;
         break;;
-    esac
+esac
 
 # Start container
 echo -e "${BGREEN} Start Container \n"

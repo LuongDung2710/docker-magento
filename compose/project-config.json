@@ -1,0 +1,25 @@
+{
+    "app_repositories_partner": [
+        {
+            "dest": "app/code/OmnyfyCustomisation",
+            "repo": "git@bitbucket.org:omnyfyteam/ubt_customisation.git",
+            "version": "develop246"
+        },
+        {
+            "dest": "app/code/Omnyfy/ProfileSelection",
+            "repo": "git@bitbucket.org:omnyfyteam/profileselection.git",
+            "version": "develop"
+        }
+    ],
+    "php-composer": "8.2-2",
+    "configuration": [
+        {
+            "path": "paypal/wpp/api_username",
+            "value": "apiusername"
+        },
+        {
+            "path": "paypal/wpp/api_password",
+            "value": "apipassword"
+        }
+    ]
+}

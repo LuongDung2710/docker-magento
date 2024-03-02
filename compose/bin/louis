@@ -122,15 +122,20 @@ fi
 
 #Import Sensitive Config Base on Project
 
+echo "Start Import Sensitive Configuration"
+
 jq -r '.configuration[] | "\(.path), \(.value)"' "$INPUTFILE" |
 while IFS= read -r data; do
- 
+    
+
     path=$(echo "$data" | cut -d ',' -f1)
     value=$(echo "$data" | cut -d ',' -f2)
+    bin/magento config:set:qarbi_sensitive $path $value
     
-    
-    echo "--------------------------------"
 done
+
+echo "End Import Sensitive Configuration"
+
 
 # Create a DNS host entry and setup Magento base url
 echo -e "${BGREEN} Set up Domain"

@@ -3,7 +3,8 @@
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="sensitive-config-set-qarbi" xsi:type="object">Qarbi\SensitiveConfigurationSet\Command\ConfigSetSensitiveCommand</item>
+                <item name="sensitive-config-set-qarbi" xsi:type="object">Qarbi\SensitiveConfigurationSet\Console\Command\ConfigSetSensitiveCommand</item>
+                <item name="sensitive-config-define-qarbi" xsi:type="object">Qarbi\SensitiveConfigurationSet\Console\Command\DefineSensitiveConfigurationCommand</item>
             </argument>
         </arguments>
     </type>

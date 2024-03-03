@@ -30,12 +30,12 @@ jq -r '.app_repositories_partner[] | "\(.dest), \(.repo), \(.version)"' "$INPUTF
 while IFS= read -r data; do
  
     dest=$(echo "$data" | cut -d ',' -f1)
-    repo=$(echo "$data" | cut -d ',' -f2)
+    repo=$(echo  "$$data" | cut -d ',' -f2)
     version=$(echo "$data" | cut -d ',' -f3)
  
-    echo "Start clone repo $repo into $dest with version $version"
+    echo -e "${CYAN} Start clone repo $repo into $dest with version $version"
     if test -d "src/$dest"; then
-    echo "Directory exists for dest $dest. Delete directory"
+    echo -e "${BYELLOW} Directory exists for dest $dest. Delete directory"
     rm -rf "src/$dest"
     fi
 
@@ -69,6 +69,7 @@ esac
 
 # Start container
 echo -e "${BGREEN} Start Container \n"
+echo -e "${CYAN}"
 bin/start --no-dev
 echo -e "\n${BGREEN}Waiting for all containers to start up ...\n${NC}"
 sleep 15
@@ -84,15 +85,17 @@ bin/copytocontainer --all ## Initial copy will take a few minutes...
 
 # Composer Install 
 echo -e "${BGREEN} Composer Install"
+echo -e "${CYAN}"
 bin/composer config --global --auth http-basic.repo.packagist.com louis.nguyen c01bbcb2c7cb0da26875b3075bece015a419ad301ae9878efae51b2b5fd4
 bin/composer install
 
-#Replace php-fpm:9000 with fastcgi_backend for 2.4.6-p1
-sed -i 's/php-fpm:9000/fastcgi_backend/g' src/nginx.conf.sample;
-
 # Copy all file from container to host 
 echo -e "${BGREEN} Copy all file from container to host"
+echo -e "${CYAN}"
 bin/copyfromcontainer --all ## Initial copy will take a few minutes...
+
+#Replace php-fpm:9000 with fastcgi_backend for 2.4.6-p1
+sed -i 's/php-fpm:9000/fastcgi_backend/g' src/nginx.conf.sample;
 
 # Remove Definer for DB sql file and import
 echo -e "${BGREEN} Import Database"
@@ -101,6 +104,7 @@ bin/mysql < src/dbdump/$DB
 
 # Import config from app/etc/env.php and app/etc/config.env file
 echo -e "${BGREEN} Import Config"
+echo -e "${CYAN}"
 bin/magento app:config:import
 bin/magento config:set web/secure/base_url https://$DOMAIN/
 bin/magento config:set web/unsecure/base_url https://$DOMAIN/
@@ -115,6 +119,7 @@ version=$(cat src/composer.json | grep "magento/product-community-edition")
 version=${version:46:3}
 if [[ $version = "2.4" ]]; then
     echo -e "\n${BGREEN}Setting up Elasticsearch ...${NC}"
+    echo -e "${CYAN}"
     bin/magento config:set catalog/search/engine 'elasticsearch7'
     bin/magento config:set catalog/search/elasticsearch7_server_hostname 'elasticsearch'
     bin/magento config:set catalog/search/elasticsearch7_server_port '9200'
@@ -122,19 +127,12 @@ fi
 
 #Import Sensitive Config Base on Project
 
-echo "Start Import Sensitive Configuration"
-
-jq -r '.configuration[] | "\(.path), \(.value)"' "$INPUTFILE" |
-while IFS= read -r data; do
-    
-
-    path=$(echo "$data" | cut -d ',' -f1)
-    value=$(echo "$data" | cut -d ',' -f2)
-    bin/magento config:set:qarbi_sensitive $path $value
-    
-done
-
-echo "End Import Sensitive Configuration"
+echo -e "${BGREEN}Start Import Sensitive Configuration"
+echo -e "${CYAN}"
+ENCODECONFIGURATION=`jq '.configuration' $INPUTFILE | jq -c`
+bin/magento config:define:qarbi_sensitive $ENCODECONFIGURATION
+#bin/magento config:set:qarbi_sensitive paypal/wpp/api_username apiusername
+echo -e "${BGREEN}End Import Sensitive Configuration"
 
 
 # Create a DNS host entry and setup Magento base url

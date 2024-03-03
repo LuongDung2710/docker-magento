@@ -1,14 +1,15 @@
 <?php
 
-namespace Qarbi\SensitiveConfigurationSet\Command;
+namespace Qarbi\SensitiveConfigurationSet\Console\Command;
 
 use Magento\Config\Console\Command\ConfigSet\ProcessorFacadeFactory;
 use Magento\Config\Console\Command\EmulatedAdminhtmlAreaProcessor;
 use Magento\Deploy\Model\DeploymentConfig\ChangeDetector;
 use Magento\Framework\App\DeploymentConfig;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Magento\Framework\Encryption\EncryptorInterface;
+
 class ConfigSetSensitiveCommand extends \Magento\Config\Console\Command\ConfigSetCommand
 {
     private EncryptorInterface $encryptor;

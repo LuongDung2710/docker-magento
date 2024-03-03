@@ -11,7 +11,7 @@ CHECKMARK='\xE2\x9C\x94'
 CROSS='\xE2\x9D\x8C'
 
 DOMAIN=$1
-SOURCE_FILE=$2
+SOURCE_FILE=marketplace-latest.zip
 PROJECT=src
 INPUTFILE=project-config.json
 
@@ -31,7 +31,6 @@ echo -e "\n ${BGREEN} Step 2) Start Clone Git Project"
 
 jq -r '.app_repositories_partner[] | "\(.dest), \(.repo), \(.version)"' "$INPUTFILE" |
 while IFS= read -r data; do
-    echo $data
     dest=$(echo "$data" | cut -d ',' -f1)
     repo=$(echo  "$data" | cut -d ',' -f2)
     version=$(echo "$data" | cut -d ',' -f3)

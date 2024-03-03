@@ -16,7 +16,8 @@ PROJECT=src
 INPUTFILE=project-config.json
 
 # Unzip source file to src folder
-echo -e "${BGREEN} Unzip Source Code to src folder \n"
+echo -e "\n ${BGREEN} Unzip Source Code to src folder \n"
+echo -e "${CYAN}"
 unzip $SOURCE_FILE -d $PROJECT
 sleep 2
 
@@ -33,7 +34,7 @@ while IFS= read -r data; do
     repo=$(echo  "$$data" | cut -d ',' -f2)
     version=$(echo "$data" | cut -d ',' -f3)
  
-    echo -e "${CYAN} Start clone repo $repo into $dest with version $version"
+    echo -e "${CYAN} Start clone repo into $dest with version $version"
     if test -d "src/$dest"; then
     echo -e "${BYELLOW} Directory exists for dest $dest. Delete directory"
     rm -rf "src/$dest"
@@ -68,29 +69,31 @@ case $PHP_COMPOSERVERSION in
 esac
 
 # Start container
-echo -e "${BGREEN} Start Container \n"
+echo -e "\n ${BGREEN} Start Container \n"
 echo -e "${CYAN}"
 bin/start --no-dev
-echo -e "\n${BGREEN}Waiting for all containers to start up ...\n${NC}"
+echo -e "\n ${BGREEN}Waiting for all containers to start up ...\n${NC}"
 sleep 15
 
 # Copy Global auth.json file and example env file
-echo -e "${BGREEN} Init auth.json and env.php file \n"
+echo -e "\n ${BGREEN} Init auth.json and env.php file \n"
+echo -e "${CYAN}"
 cp ~/.composer/auth.json src
 cp env.example.php src/app/etc/env.php
 
 # Copy all file from host to container 
-echo -e "${BGREEN} Copy all file from host to container"
+echo -e "\n ${BGREEN} Copy all file from host to container"
+echo -e "${CYAN}"
 bin/copytocontainer --all ## Initial copy will take a few minutes...
 
 # Composer Install 
-echo -e "${BGREEN} Composer Install"
+echo -e "\n ${BGREEN} Composer Install"
 echo -e "${CYAN}"
 bin/composer config --global --auth http-basic.repo.packagist.com louis.nguyen c01bbcb2c7cb0da26875b3075bece015a419ad301ae9878efae51b2b5fd4
 bin/composer install
 
 # Copy all file from container to host 
-echo -e "${BGREEN} Copy all file from container to host"
+echo -e "\n ${BGREEN} Copy all file from container to host"
 echo -e "${CYAN}"
 bin/copyfromcontainer --all ## Initial copy will take a few minutes...
 
@@ -98,12 +101,13 @@ bin/copyfromcontainer --all ## Initial copy will take a few minutes...
 sed -i 's/php-fpm:9000/fastcgi_backend/g' src/nginx.conf.sample;
 
 # Remove Definer for DB sql file and import
-echo -e "${BGREEN} Import Database"
+echo -e "\n ${BGREEN} Import Database"
+echo -e "${CYAN}"
 sed 's/\sDEFINER=`[^`]*`@`[^`]*`//g' -i src/dbdump/$DB
 bin/mysql < src/dbdump/$DB
 
 # Import config from app/etc/env.php and app/etc/config.env file
-echo -e "${BGREEN} Import Config"
+echo -e "\n ${BGREEN} Import Config"
 echo -e "${CYAN}"
 bin/magento app:config:import
 bin/magento config:set web/secure/base_url https://$DOMAIN/
@@ -118,16 +122,30 @@ bin/magento config:set admin/url/custom https://$DOMAIN/
 version=$(cat src/composer.json | grep "magento/product-community-edition")
 version=${version:46:3}
 if [[ $version = "2.4" ]]; then
-    echo -e "\n${BGREEN}Setting up Elasticsearch ...${NC}"
+    echo -e "\n ${BGREEN}Setting up Elasticsearch ...${NC}"
     echo -e "${CYAN}"
     bin/magento config:set catalog/search/engine 'elasticsearch7'
     bin/magento config:set catalog/search/elasticsearch7_server_hostname 'elasticsearch'
     bin/magento config:set catalog/search/elasticsearch7_server_port '9200'
 fi
 
+
+
+# Create a DNS host entry and setup Magento base url
+echo -e "\n ${BGREEN} Set up Domain"
+
+bin/setup-domain $DOMAIN
+
+
+#Bin Magento Setup
+echo -e "\n ${BGREEN}Start Run bin/magneto setup"
+echo -e "${CYAN}"
+bin/magento set:up 
+echo -e "${BGREEN}End Run bin/magneto setup"
+
 #Import Sensitive Config Base on Project
 
-echo -e "${BGREEN}Start Import Sensitive Configuration"
+echo -e "\n ${BGREEN}Start Import Sensitive Configuration"
 echo -e "${CYAN}"
 ENCODECONFIGURATION=`jq '.configuration' $INPUTFILE | jq -c`
 bin/magento config:define:qarbi_sensitive $ENCODECONFIGURATION
@@ -135,8 +153,4 @@ bin/magento config:define:qarbi_sensitive $ENCODECONFIGURATION
 echo -e "${BGREEN}End Import Sensitive Configuration"
 
 
-# Create a DNS host entry and setup Magento base url
-echo -e "${BGREEN} Set up Domain"
-
-bin/setup-domain $DOMAIN
 open https://$DOMAIN

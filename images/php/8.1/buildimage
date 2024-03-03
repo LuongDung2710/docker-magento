@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+docker build -t louisqarbi/php8.1composer2.22:1.0 .

@@ -52,10 +52,11 @@ while IFS= read -r data; do
  
     echo -e "${CYAN} Start clone repo $repo into $dest with version $version"
     if test -d "src/$dest"; then
-    echo -e "${BYELLOW} Directory exists for dest $dest. Delete directory"
+    echo -e "${RED} Directory exists for dest $dest. Delete directory"
     rm -rf "src/$dest"
     fi
 
+    echo -e "${BYELLOW}"
     git clone $repo src/$dest --branch $version
 
     echo "--------------------------------"
@@ -69,21 +70,25 @@ PHP_COMPOSERVERSION=`jq '.phpcomposer' $INPUTFILE`
 OPTION1="\"7.4-1\""
 OPTION2="\"7.4-2\""
 OPTION3="\"8.2-2\""
+OPTION4="\"8.1-2\""
 
 echo -e "\n ${BGREEN} Step 3) Define php and composer version in compose.yaml file \n"
 echo -e "${CYAN} Version found: $PHP_COMPOSERVERSION"
 
 case $PHP_COMPOSERVERSION in
     $OPTION1 ) 
-        sed -i 's/louisphp8:1.0/louisphp7.4composer1:1.0/g' compose.yaml;
+        sed -i 's/qarbiphpfpmversion/louisqarbi\/php7.4composer1:1.0/g' compose.yaml;
         sed -i 's/mariadb:10.6/mariadb:10.4/g' compose.yaml;
         ;;
     $OPTION2 )
-        sed -i 's/louisphp8:1.0/louisphp7.4composer2.22:1.0/g' compose.yaml;
+        sed -i 's/qarbiphpfpmversion/louisqarbi\/php7.4composer2.22:1.0/g' compose.yaml;
         sed -i 's/mariadb:10.6/mariadb:10.4/g' compose.yaml;
         ;;
     $OPTION3 )
-        sed -i 's/louisphp8:1.0/louisphp8.2composer2.22:1.0/g' compose.yaml;
+        sed -i 's/qarbiphpfpmversion/louisqarbi\/php8.2composer2.22:1.0/g' compose.yaml;
+        ;;
+    $OPTION4 )
+        sed -i 's/qarbiphpfpmversion/louisqarbi\/php8.1composer2.22:1.0/g' compose.yaml;
         ;;
 esac
 

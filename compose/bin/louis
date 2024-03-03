@@ -16,7 +16,7 @@ PROJECT=src
 INPUTFILE=project-config.json
 
 # Unzip source file to src folder
-echo -e "\n ${BGREEN} Unzip Source Code to src folder \n"
+echo -e "\n ${BGREEN} Step 1) Unzip Source Code to src folder \n"
 echo -e "${CYAN}"
 unzip $SOURCE_FILE -d $PROJECT
 sleep 2
@@ -27,14 +27,16 @@ DB=$(ls $PROJECT/dbdump)
 mv ./Qarbi ./src/app/code/
 
 
+echo -e "\n ${BGREEN} Step 2) Start Clone Git Project"
+
 jq -r '.app_repositories_partner[] | "\(.dest), \(.repo), \(.version)"' "$INPUTFILE" |
 while IFS= read -r data; do
- 
+    echo $data
     dest=$(echo "$data" | cut -d ',' -f1)
-    repo=$(echo  "$$data" | cut -d ',' -f2)
+    repo=$(echo  "$data" | cut -d ',' -f2)
     version=$(echo "$data" | cut -d ',' -f3)
  
-    echo -e "${CYAN} Start clone repo into $dest with version $version"
+    echo -e "${CYAN} Start clone repo $repo into $dest with version $version"
     if test -d "src/$dest"; then
     echo -e "${BYELLOW} Directory exists for dest $dest. Delete directory"
     rm -rf "src/$dest"
@@ -45,7 +47,7 @@ while IFS= read -r data; do
     echo "--------------------------------"
 done
 
-
+echo -e "\n ${BGREEN} END Clone Git Project"
 
 PHP_COMPOSERVERSION=`jq '.phpcomposer' $INPUTFILE`
 
@@ -53,6 +55,9 @@ PHP_COMPOSERVERSION=`jq '.phpcomposer' $INPUTFILE`
 OPTION1="\"7.4-1\""
 OPTION2="\"7.4-2\""
 OPTION3="\"8.2-2\""
+
+echo -e "\n ${BGREEN} Step 3) Define php and composer version in compose.yaml file \n"
+echo -e "${CYAN} Version found: $PHP_COMPOSERVERSION"
 
 case $PHP_COMPOSERVERSION in
     $OPTION1 ) 
@@ -69,31 +74,31 @@ case $PHP_COMPOSERVERSION in
 esac
 
 # Start container
-echo -e "\n ${BGREEN} Start Container \n"
+echo -e "\n ${BGREEN} Step 4) Start Container \n"
 echo -e "${CYAN}"
 bin/start --no-dev
 echo -e "\n ${BGREEN}Waiting for all containers to start up ...\n${NC}"
 sleep 15
 
 # Copy Global auth.json file and example env file
-echo -e "\n ${BGREEN} Init auth.json and env.php file \n"
+echo -e "\n ${BGREEN} Step 5) Init auth.json and env.php file \n"
 echo -e "${CYAN}"
 cp ~/.composer/auth.json src
 cp env.example.php src/app/etc/env.php
 
 # Copy all file from host to container 
-echo -e "\n ${BGREEN} Copy all file from host to container"
+echo -e "\n ${BGREEN} Step 6) Copy all file from host to container"
 echo -e "${CYAN}"
 bin/copytocontainer --all ## Initial copy will take a few minutes...
 
 # Composer Install 
-echo -e "\n ${BGREEN} Composer Install"
+echo -e "\n ${BGREEN} Step 7) Composer Install"
 echo -e "${CYAN}"
 bin/composer config --global --auth http-basic.repo.packagist.com louis.nguyen c01bbcb2c7cb0da26875b3075bece015a419ad301ae9878efae51b2b5fd4
 bin/composer install
 
 # Copy all file from container to host 
-echo -e "\n ${BGREEN} Copy all file from container to host"
+echo -e "\n ${BGREEN} Step 8) Copy all file from container to host"
 echo -e "${CYAN}"
 bin/copyfromcontainer --all ## Initial copy will take a few minutes...
 
@@ -101,13 +106,13 @@ bin/copyfromcontainer --all ## Initial copy will take a few minutes...
 sed -i 's/php-fpm:9000/fastcgi_backend/g' src/nginx.conf.sample;
 
 # Remove Definer for DB sql file and import
-echo -e "\n ${BGREEN} Import Database"
+echo -e "\n ${BGREEN} Step 9) Import Database"
 echo -e "${CYAN}"
 sed 's/\sDEFINER=`[^`]*`@`[^`]*`//g' -i src/dbdump/$DB
 bin/mysql < src/dbdump/$DB
 
 # Import config from app/etc/env.php and app/etc/config.env file
-echo -e "\n ${BGREEN} Import Config"
+echo -e "\n ${BGREEN} Step 10) Import Config"
 echo -e "${CYAN}"
 bin/magento app:config:import
 bin/magento config:set web/secure/base_url https://$DOMAIN/
@@ -122,7 +127,7 @@ bin/magento config:set admin/url/custom https://$DOMAIN/
 version=$(cat src/composer.json | grep "magento/product-community-edition")
 version=${version:46:3}
 if [[ $version = "2.4" ]]; then
-    echo -e "\n ${BGREEN}Setting up Elasticsearch ...${NC}"
+    echo -e "\n ${BGREEN} Step 11) Setting up Elasticsearch ...${NC}"
     echo -e "${CYAN}"
     bin/magento config:set catalog/search/engine 'elasticsearch7'
     bin/magento config:set catalog/search/elasticsearch7_server_hostname 'elasticsearch'
@@ -132,20 +137,20 @@ fi
 
 
 # Create a DNS host entry and setup Magento base url
-echo -e "\n ${BGREEN} Set up Domain"
-
+echo -e "\n ${BGREEN} Step 12) Set up Domain"
+echo -e "${CYAN}"
 bin/setup-domain $DOMAIN
 
 
 #Bin Magento Setup
-echo -e "\n ${BGREEN}Start Run bin/magneto setup"
+echo -e "\n ${BGREEN} Step 13) Start Run bin/magneto setup"
 echo -e "${CYAN}"
 bin/magento set:up 
 echo -e "${BGREEN}End Run bin/magneto setup"
 
 #Import Sensitive Config Base on Project
 
-echo -e "\n ${BGREEN}Start Import Sensitive Configuration"
+echo -e "\n ${BGREEN} Step 14) Start Import Sensitive Configuration"
 echo -e "${CYAN}"
 ENCODECONFIGURATION=`jq '.configuration' $INPUTFILE | jq -c`
 bin/magento config:define:qarbi_sensitive $ENCODECONFIGURATION

@@ -14,6 +14,21 @@ DOMAIN=$1
 SOURCE_FILE=marketplace-latest.zip
 PROJECT=src
 INPUTFILE=project-config.json
+MARKETPLACE_NAMES=$(curl --location 'https://ana69rk81c.execute-api.ap-southeast-1.amazonaws.com/Development/getProjectList');
+MARKETPLACE_NAMES_BEAUTY=$(echo "$MARKETPLACE_NAMES" | jq '.')
+
+echo -e "\n ${BYELLOW}Found marketplaces:"
+# Beautify the JSON array using jq
+echo -e "${CYAN} $MARKETPLACE_NAMES_BEAUTY"
+
+echo -e "${BYELLOW}"
+echo
+read -e -p " Enter marketplace name: " MARKETPLACE
+
+echo -e "\n ${CYAN} Get Configuration for $MARKETPLACE\n"
+> project-config.json
+curl --location 'https://qwcqc4jhad.execute-api.ap-southeast-1.amazonaws.com/Development/getSpecificProjectConfig' >> project-config.json
+
 
 # Unzip source file to src folder
 echo -e "\n ${BGREEN} Step 1) Unzip Source Code to src folder \n"

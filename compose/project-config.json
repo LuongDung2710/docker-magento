@@ -4,11 +4,6 @@
             "dest": "app/code/OmnyfyCustomisation",
             "repo": "git@bitbucket.org:omnyfyteam/ubt_customisation.git",
             "version": "develop246"
-        },
-        {
-            "dest": "app/code/Omnyfy/ProfileSelection",
-            "repo": "git@bitbucket.org:omnyfyteam/profileselection.git",
-            "version": "develop"
         }
     ],
     "phpcomposer": "8.2-2",
@@ -16,10 +11,6 @@
         {
             "path": "paypal/wpp/api_username",
             "value": "apiusername"
-        },
-        {
-            "path": "paypal/wpp/api_password",
-            "value": "apipassword"
         }
     ]
 }

@@ -1,5 +1,4 @@
 FROM php:8.2-fpm-bullseye
-MAINTAINER Mark Shust <mark@shust.com>
 
 ARG APP_ID=1000
 RUN groupadd -g "$APP_ID" app \
@@ -84,7 +83,7 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
 
 RUN curl -sS https://getcomposer.org/installer | \
-  php -- --install-dir=/usr/local/bin --version=2.2.22 --filename=composer
+  php -- --install-dir=/usr/local/bin --version=2.6.5 --filename=composer
 
 COPY conf/blackfire.ini $PHP_INI_DIR/conf.d/blackfire.ini
 COPY conf/msmtprc /etc/msmtprc
